@@ -1,0 +1,121 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  // url      = env("DATABASE_URL")
+}
+
+enum Role {
+  CA
+  CLIENT
+}
+
+enum FilingType {
+  ITR
+  GST
+  TDS
+  ROC
+  DGFT
+  MCA
+}
+
+enum FilingStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  REJECTED
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String
+  role      Role
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  ca        CA?
+  client    Client?
+}
+
+model CA {
+  id           Int      @id @default(autoincrement())
+  firmName     String
+  licenseNumber String  @unique
+  phone        String
+  address      String
+  user         User     @relation(fields: [userId], references: [id])
+  userId       Int      @unique
+  clients      Client[]
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Client {
+  id          Int      @id @default(autoincrement())
+  fullName    String
+  pan         String   @unique
+  gst         String?
+  aadhaar     String?  @unique
+  phone       String
+  address     String
+  user        User     @relation(fields: [userId], references: [id])
+  userId      Int      @unique
+  ca          CA       @relation(fields: [caId], references: [id])
+  caId        Int
+  dscTokens   DscToken[]
+  filings     Filing[]
+  documents   Document[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model DscToken {
+  id         Int       @id @default(autoincrement())
+  tokenBrand String
+  expiryDate DateTime
+  isHeldByCA Boolean   @default(true)
+  notes      String?
+  client     Client    @relation(fields: [clientId], references: [id])
+  clientId   Int
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+}
+
+model Filing {
+  id          Int          @id @default(autoincrement())
+  type        FilingType
+  status      FilingStatus @default(PENDING)
+  periodFrom  DateTime
+  periodTo    DateTime
+  notes       String?
+  client      Client       @relation(fields: [clientId], references: [id])
+  clientId    Int
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+}
+
+model Document {
+  id          Int      @id @default(autoincrement())
+  fileName    String
+  fileUrl     String
+  isSigned    Boolean  @default(false)
+  signedAt    DateTime?
+  client      Client   @relation(fields: [clientId], references: [id])
+  clientId    Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model AuditLog {
+  id          Int      @id @default(autoincrement())
+  action      String
+  entityType  String
+  entityId    Int
+  performedBy Int
+  ipAddress   String?
+  txHash      String?  
+  createdAt   DateTime @default(now())
+}
