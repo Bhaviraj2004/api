@@ -27,7 +27,25 @@ export class AuthController {
 
   @UseGuards(JwtGuard)
   @Get('me')
-  getMe(@Request() req: any) {
-    return req.user;
+  async getMe(@Request() req: any) {
+    const user = await this.authService.getUserProfile(req.user.id);
+    return {
+      id: user.id,
+      email: user.email,
+      role: user.role,
+      totpEnabled: user.totpEnabled,
+    };
+  }
+
+  @UseGuards(JwtGuard)
+  @Get('totp/setup')
+  setupTotp(@Request() req: any) {
+    return this.authService.setupTotp(req.user.id);
+  }
+
+  @UseGuards(JwtGuard)
+  @Post('totp/enable')
+  enableTotp(@Request() req: any, @Body('code') code: string) {
+    return this.authService.enableTotp(req.user.id, code);
   }
 }

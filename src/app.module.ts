@@ -8,18 +8,24 @@ import { UserModule } from './user/user.module';
 import { CaModule } from './ca/ca.module';
 import { ClientModule } from './client/client.module';
 import { DscTokenModule } from './dsc-token/dsc-token.module';
+import { FilingModule } from './filing/filing.module';
+import { DocumentModule } from './document/document.module';
+import { AuditLogModule } from './audit-log/audit-log.module';
+import { MailModule } from './mail/mail.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({
-      isGlobal: true,
-    }),
+    ConfigModule.forRoot({ isGlobal: true }),
     PrismaModule,
     AuthModule,
     UserModule,
     CaModule,
     ClientModule,
     DscTokenModule,
+    FilingModule,
+    DocumentModule,
+    AuditLogModule,
+    MailModule,
   ],
   controllers: [AppController],
   providers: [AppService],
