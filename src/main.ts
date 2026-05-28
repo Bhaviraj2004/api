@@ -17,7 +17,7 @@ async function bootstrap() {
   // });
 
   app.enableCors({
-    origin: '*',
+    origin: 'https://dsc-platform-web.vercel.app',
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: false,
